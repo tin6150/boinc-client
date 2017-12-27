@@ -26,7 +26,7 @@ singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd.sim
 singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd.simg /usr/bin/boinccmd --get_state
 cp -p /tmp/boinc/gui_rpc_auth.cfg .
 singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd.simg /usr/bin/boinccmd --read_global_prefs_override   # this req working auth
-# output will be directed to /tmp/boinc/boinc*.log 
+# output will be directed to /tmp/boinc/stdoutdae.log 
 
 singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd.simg /bin/zsh
   /usr/bin/boinccmd --project_attach http://setiathome.berkeley.edu 824003_a8aa1de0c75802fc1651a1015133624f  # adjust to your own weak key
