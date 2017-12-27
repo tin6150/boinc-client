@@ -35,15 +35,20 @@ singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd.sim
 /usr/bin/boinccmd --project_attach http://www.gpugrid.net 518173_5f7f1ae63651a14444ca08429fe16ae6
 ##/usr/bin/boinccmd --project http://www.gpugrid.net detach 
 /usr/bin/boinccmd --get_state
+cd /var/lib/boinc
 /usr/bin/boinccmd --set_run_mode always 86400 # 86400 seconds = 24 hours
 /usr/bin/boinccmd --set_gpu_mode always 86400 # 86400 seconds = 24 hours
 #https://www.systutorials.com/docs/linux/man/1-boinccmd/
 
-### method 1a: boinc runs, but gui_rpc authentication always fail, cuz of namespace?
+### alt method 
 singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd-r2-c6.simg /usr/bin/boinc --check_all_logins --redirectio --dir /var/lib/boinc &
 singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd-r2-c6.simg /usr/bin/boinccmd --get_state
+cp -p /tmp/boinc/gui_rpc_auth.cfg .
+singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd-r2-c6.simg /usr/bin/boinccmd --read_global_prefs_override   # this req working auth
+singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd-r2-c6.simg /usr/bin/boinccmd --set_run_mode always 86400 # 86400 seconds = 24 hours
+singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd-r2-c6.simg /usr/bin/boinccmd --project_attach http://www.gpugrid.net 518173_5f7f1ae63651a14444ca08429fe16ae6
 
-# r3 build in c7 didn't work, get auth error -155 often.
+
 
 ## method 2, with Berkeley Install bin in /opt/BOINC
 export LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:$LD_LIBRARY_PATH
