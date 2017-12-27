@@ -24,9 +24,39 @@ To use this container:
 singularity pull --name boinccmd shub://tin6150/boinc-client
 mkdir /tmp/boinc
 mkdir /tmp/boinc-lib
-singularity exec -B /tmp/boinc:/var/log  ./boinccmd.simg /opt/BOINC/bin/run_client --run_benchmarks
+singularity exec -B /tmp/boinc:/var/log -B /tmp/boinc:/var/lib/boinc ./boinccmd.simg /bin/bash
+/usr/bin/boinc --check_all_logins --redirectio --dir /var/lib/boinc &
+## no, did something here that triggered it to work...
+## unless someone blocked boinc connection at the network...  RPC auth fail... TCP 31416...
+## give time for server to get ready (run_benchmarks)
+## stangely can't get to setiathome, route blocked to 208.68.240.110 ??
+#/usr/bin/boinccmd --set_proxy_settings  # to what though??
+/usr/bin/boinccmd --project_attach http://setiathome.berkeley.edu 824003_a8aa1de0c75802fc1651a1015133624f
+/usr/bin/boinccmd --project_attach http://www.gpugrid.net 518173_5f7f1ae63651a14444ca08429fe16ae6
+##/usr/bin/boinccmd --project http://www.gpugrid.net detach 
+/usr/bin/boinccmd --get_state
+/usr/bin/boinccmd --set_run_mode always 86400 # 86400 seconds = 24 hours
+/usr/bin/boinccmd --set_gpu_mode always 86400 # 86400 seconds = 24 hours
+#https://www.systutorials.com/docs/linux/man/1-boinccmd/
+
+### method 1a:
+singularity exec -B /tmp/boinc:/var/log -B /tmp/boinc:/var/lib/boinc ./boinccmd-r2-c6.simg /usr/bin/boinc --check_all_logins --redirectio --dir /var/lib/boinc &
+singularity exec -B /tmp/boinc:/var/log -B /tmp/boinc:/var/lib/boinc ./boinccmd-r2-c6.simg /usr/bin/boinccmd --get_state
+
+# r3 build in c7 didn't work, get auth error -155 often.
+
+## method 2, with Berkeley Install bin in /opt/BOINC
+export LD_LIBRARY_PATH=/lib64:/lib:/usr/lib64:/usr/lib:$LD_LIBRARY_PATH
+
+
+#singularity exec -B /tmp/boinc:/var/log -B /tmp/boinc-lib:/var/lib/boinc ./boinccmd.simg /opt/BOINC/bin/run_client --run_benchmarks
+#singularity exec -B /tmp/boinc:/var/log -B /tmp/boinc-lib:/var/lib/boinc ./boinccmd.simg /usr/bin/boinccmd --project_attach http://setiathome.berkeley.edu 824003_a8aa1de0c75802fc1651a1015133624f
 
 ## ??
+
+## service start this process as user boinc (ubuntu):
+
+## /usr/bin/boinc --check_all_logins --redirectio --dir /var/lib/boinc-client
 
 # singularity exec -B /tmp/boinc:/var/log -B /tmp/boinc-lib:/var/lib/boinc ./boinccmd.simg /usr/bin/boinccmd --project_attach http://setiathome.berkeley.edu 824003_a8aa1de0c75802fc1651a1015133624f
 
@@ -46,7 +76,7 @@ singularity exec -B /tmp/boinc:/var/log  ./boinccmd.simg /opt/BOINC/bin/run_clie
 	#echo "Hello from inside the container"
 	touch 	 		  /THIS_IS_INSIDE_SINGULARITY
 	echo "build start"     >> /THIS_IS_INSIDE_SINGULARITY
-	date           >> /THIS_IS_INSIDE_SINGULARITY
+	date                   >> /THIS_IS_INSIDE_SINGULARITY
 	#apt-get -qy install \
 	yum -y install \
 			vim bash zsh wget curl tar which \
@@ -75,6 +105,8 @@ singularity exec -B /tmp/boinc:/var/log  ./boinccmd.simg /opt/BOINC/bin/run_clie
 	# this will get all dependencies that boinc needs, 
 	# without running pre-install script like adding user and service 
 	yum -y install  epel-release openssl-devel 
+	ln -s /usr/lib64/libcrypto.so /usr/lib64/libcrypto.so.1.0.0   # not sure why isn't there, hope works
+	ln -s /usr/lib64/libssl.so    /usr/lib64/libssl.so.1.0.0      # really .so.1.0.2k
 		#openssl-devel for libcrypto libssl 
 		# boincmgr will require lots of GUI libs, like libnotify-devel 
 
