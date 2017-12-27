@@ -27,9 +27,11 @@ This container is a Ubuntu with nvidia cuda runtime + BOINC client
 
 %post
 	#echo "Hello from inside the container"
-	touch /THIS_IS_INSIDE_SINGULARITY
+	touch 	 	  /THIS_IS_INSIDE_SINGULARITY
+	echo "start"   >> /THIS_IS_INSIDE_SINGULARITY
+	date           >> /THIS_IS_INSIDE_SINGULARITY
 	#apt-get -qy install \
-	yum -ty install \
+	yum -y install \
 			vim bash zsh wget curl tar which \
 			environment-modules telnet nc 
 			#ipmitool \
@@ -43,8 +45,8 @@ This container is a Ubuntu with nvidia cuda runtime + BOINC client
 
 
 	#apt-get -qy install \
-	yum -ty install \
-			coreutils util-linux-ng man \
+	yum -y install \
+			coreutils util-linux-ng man 
 	# https://help.ubuntu.com/community/Cuda
 	#apt-get -qy install \
 	#		libxi-dev libxmu-dev freeglut3-dev build-essential binutils-gold	
@@ -60,16 +62,26 @@ This container is a Ubuntu with nvidia cuda runtime + BOINC client
 	# the Berkeley Installer may work more like a user program without daemon stuff?
 	# at least no root priv so won't be creating services
 	# probably don't need to add the boinc user, but just for it to host the file.
-	useradd -d /opt/boinc -m -s /bin/false -o -g 29888 -u 29888 boinc 
-	#test -d /opt/boinc || mkdir -p /opt/boinc
-	cd /opt/boinc
-	test -f boinc-64.sh || wget --no-verbose "https://boinc.berkeley.edu/dl/boinc_7.2.42_x86_64-pc-linux-gnu.sh" -O boinc-64.sh 
-	sh boinc-64.sh
+	#groupadd -f -g 29888 boinc
+	#useradd -d /opt/BOINC -m -s /bin/false -o -g 29888 -u 29888 boinc 
+	#test -d /opt/BOINC || mkdir -p /opt/BOINC
+	#chmod 775 /opt/BOINC
+	#cd /opt
+	# this hopefully get all dependencies but not install, so won't execute scripts that add service...
+	yum -y install  epel-release
+	yum --setopt=tsflags=noscripts -y install boinc-client   # this works, don't add boinc user.  
+	yum --setopt=tsflags=noscripts -y install boinc-manager
+	#yum -q -y install --noplugins --setopt=tsflags=noscripts --downloadonly --downloaddir=/opt  boinc-client boinc-manager
+	#rpm -i --noscripts /opt/boinc-client*rpm 
+	#rpm -i --noscripts /opt/boinc-manager*rpm 
+	#test -f boinc-64.sh || wget --no-verbose "https://boinc.berkeley.edu/dl/boinc_7.2.42_x86_64-pc-linux-gnu.sh" -O boinc-64.sh 
+	#sh boinc-64.sh
+	#rm boinc-64.sh
 
 
+	echo "end"   >> /THIS_IS_INSIDE_SINGULARITY
+	date         >> /THIS_IS_INSIDE_SINGULARITY
 
-	echo "end"                  >> /THIS_IS_INSIDE_SINGULARITY
-	date                        >> /THIS_IS_INSIDE_SINGULARITY
 
 %labels
 MAINTAINER  Tin Ho tin'at'lbl.gov
