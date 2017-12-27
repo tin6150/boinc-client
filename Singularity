@@ -23,8 +23,8 @@ It doesn't quite work as desired yet.
 To use this container:
 singularity pull --name boinccmd shub://tin6150/boinc-client
 mkdir /tmp/boinc
-mkdir /tmp/boinc-lib
-singularity exec -B /tmp/boinc:/var/log -B /tmp/boinc:/var/lib/boinc ./boinccmd.simg /bin/bash
+#mkdir /tmp/boinc-lib
+singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd.simg /bin/bash
 /usr/bin/boinc --check_all_logins --redirectio --dir /var/lib/boinc &
 ## no, did something here that triggered it to work...
 ## unless someone blocked boinc connection at the network...  RPC auth fail... TCP 31416...
@@ -39,9 +39,9 @@ singularity exec -B /tmp/boinc:/var/log -B /tmp/boinc:/var/lib/boinc ./boinccmd.
 /usr/bin/boinccmd --set_gpu_mode always 86400 # 86400 seconds = 24 hours
 #https://www.systutorials.com/docs/linux/man/1-boinccmd/
 
-### method 1a:
-singularity exec -B /tmp/boinc:/var/log -B /tmp/boinc:/var/lib/boinc ./boinccmd-r2-c6.simg /usr/bin/boinc --check_all_logins --redirectio --dir /var/lib/boinc &
-singularity exec -B /tmp/boinc:/var/log -B /tmp/boinc:/var/lib/boinc ./boinccmd-r2-c6.simg /usr/bin/boinccmd --get_state
+### method 1a: boinc runs, but gui_rpc authentication always fail, cuz of namespace?
+singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd-r2-c6.simg /usr/bin/boinc --check_all_logins --redirectio --dir /var/lib/boinc &
+singularity exec -B /tmp/boinc:/var/log,/tmp/boinc:/var/lib/boinc ./boinccmd-r2-c6.simg /usr/bin/boinccmd --get_state
 
 # r3 build in c7 didn't work, get auth error -155 often.
 
